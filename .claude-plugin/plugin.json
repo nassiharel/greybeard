@@ -1,0 +1,11 @@
+{
+  "name": "greybeard",
+  "description": "A master skill that makes coding agents write less code, more correctly: surface assumptions, build the minimum that works, cut surgically, and verify before claiming done",
+  "version": "1.0.0",
+  "author": {
+    "name": "greybeard"
+  },
+  "license": "MIT",
+  "keywords": ["guidelines", "best-practices", "coding", "yagni", "simplicity", "minimal"],
+  "skills": ["./skills/greybeard"]
+}

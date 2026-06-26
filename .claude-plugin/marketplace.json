@@ -1,0 +1,31 @@
+{
+  "name": "greybeard",
+  "id": "greybeard",
+  "owner": {
+    "name": "greybeard"
+  },
+  "metadata": {
+    "description": "A master skill for disciplined, minimal, verified coding — distilled into four moves: think first, build the minimum, cut surgically, verify",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "greybeard",
+      "source": "./",
+      "description": "Write less code, more correctly: surface assumptions before coding, climb the simplicity ladder to the minimum that works, cut surgically, and verify before claiming done",
+      "version": "1.0.0",
+      "author": {
+        "name": "greybeard"
+      },
+      "keywords": [
+        "guidelines",
+        "best-practices",
+        "coding",
+        "yagni",
+        "simplicity",
+        "minimal"
+      ],
+      "category": "workflow"
+    }
+  ]
+}
