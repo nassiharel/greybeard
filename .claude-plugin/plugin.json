@@ -15,7 +15,12 @@
     "simplicity",
     "minimal",
     "code-review",
-    "verification"
+    "verification",
+    "refactoring",
+    "code-quality",
+    "software-craftsmanship",
+    "overengineering",
+    "clean-code"
   ],
   "skills": [
     "./skills/greybeard"

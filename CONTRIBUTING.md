@@ -4,6 +4,13 @@ Thanks for wanting to improve greybeard. It is deliberately **one sharp, focused
 bar for changing it is "does this measurably improve how an agent behaves, across the tasks people
 actually do?"
 
+**What doesn't qualify:**
+
+- *Style preferences* — "the wording reads better" is not a problem statement.
+- *Language-specific rules* — these belong in your project's own rules file, not in a general skill.
+- *Rules that duplicate existing ones* — check whether the behavior is already covered before adding.
+- *Additions without an observed failure* — if you haven't seen the agent do the wrong thing, you're speculating. Don't pre-write rules for problems you haven't encountered.
+
 ## Repository layout
 
 ```
