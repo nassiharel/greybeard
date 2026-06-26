@@ -17,7 +17,5 @@
     "code-review",
     "verification"
   ],
-  "skills": [
-    "./skills/greybeard"
-  ]
+  "skills": "./skills/"
 }
