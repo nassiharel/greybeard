@@ -1,6 +1,6 @@
 ---
 name: greybeard
-description: Use when writing, reviewing, refactoring, or fixing code, or when a request risks over-engineering — bloat, boilerplate, speculative abstraction, unnecessary dependencies, drive-by edits, premature optimization, or unverified "done" claims. Triggers on "be lazy", "simplest solution", "minimal", "yagni", "do less", "overengineering", "gold-plating", "clean code", "shortest path", and complaints about overcomplicated code. Surfaces assumptions before coding, builds the minimum that works, cuts surgically, and verifies before claiming done.
+description: Use when writing, reviewing, refactoring, or fixing code, or when a request risks over-engineering — bloat, boilerplate, speculative abstraction, unnecessary dependencies, drive-by edits, premature optimization, or unverified "done" claims. Triggers on "yagni", "minimal", "simplest solution", "overengineering", "gold-plating", "be lazy", "do less", and complaints about overcomplicated code. Surfaces assumptions before coding, builds the minimum that works, cuts surgically, and verifies before claiming done.
 license: MIT
 ---
 
@@ -104,7 +104,8 @@ Laziness has hard limits. **Never simplify away:**
 - Input validation at trust boundaries.
 - Error handling that prevents data loss.
 - Security measures and accessibility basics.
-- Calibration knobs and hard-to-reverse operations — financial transactions, physical hardware, or external systems where errors can't be quickly rolled back.
+- Calibration knobs and configuration that controls real-world state.
+- Hard-to-reverse operations — financial transactions, physical hardware, or external systems where errors can't be quickly rolled back.
 - Anything the user explicitly requested. They insist on the full version → build it, no re-arguing.
 
 And **never be lazy about understanding.** The ladder shortens the solution, never the reading. Laziness that skips comprehension ships a confident wrong fix dressed up as efficiency.
