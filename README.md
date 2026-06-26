@@ -98,11 +98,12 @@ You should notice your agent:
 
 ## Philosophy
 
-- **Think before coding** — understand the goal; don't guess about anything load-bearing.
-- **Simplicity, not carelessness** — the least code that solves the real problem, with the
-  safety checks intact.
+- **First principles over intuition** — understand the goal fully; don't guess about anything load-bearing.
+- **Simplicity, not carelessness** — the least code that solves the real problem, with the safety checks intact.
 - **Surgical changes** — every changed line traces to the request.
 - **Evidence over claims** — "done" means you watched it work, not that you wrote it.
+- **Craftsmanship** — clear names, linear flow, risks surfaced early; polish is part of the job.
+- **Decisive execution** — understand deeply, then pick one path and ship it; momentum matters.
 - **Honest trade-offs** — this biases toward caution over speed. For trivial tasks, move fast.
 
 ## License
