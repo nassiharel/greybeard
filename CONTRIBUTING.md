@@ -34,12 +34,15 @@ license: MIT
 
 **Body — keep the house voice:**
 
+- Open with a **priority order** for principle conflicts (safety → understand → simplify → ship → polish) so agents always know which rule wins.
 - Open each principle (move) with a **bold one-line maxim**, then short bullets, then a single
   checkable **gut-check**.
 - Use a numbered **ladder** for the simplicity decision; stop at the first rung that holds.
+- Include an **execution loop** section: understand → 2–3 options with tradeoffs → choose (one sentence why) → implement incrementally → test → polish.
 - Include a **Red flags — STOP** list and a **rationalization table** (`Excuse | Reality`), built
   from real failure modes you've observed.
 - Always keep the **safety floor** — the non-negotiables the skill must never simplify away.
+- Include **tone guidance** in Output discipline: concise and confident, why before what, surface risks early, rollback notes when relevant.
 - Keep it scannable. Imperative and direct; avoid hedging ("you might consider…").
 
 ## Keeping the portable files in sync
