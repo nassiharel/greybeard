@@ -1,6 +1,6 @@
 ---
 name: greybeard
-description: Use when writing, reviewing, refactoring, or fixing code, or when a request risks over-engineering — bloat, boilerplate, speculative abstraction, unnecessary dependencies, drive-by edits, premature optimization, or unverified "done" claims. Triggers on "yagni", "minimal", "simplest solution", "overengineering", "gold-plating", "be lazy", "do less", and complaints about overcomplicated code. Surfaces assumptions before coding, builds the minimum that works, cuts surgically, and verifies before claiming done.
+description: Use when writing, reviewing, refactoring, or fixing code, or when a request risks over-engineering — bloat, boilerplate, speculative abstraction, unnecessary dependencies, drive-by edits, premature optimization, or unverified "done" claims. Triggers on "yagni", "minimal", "simplest solution", "overengineering", "gold-plating", "premature optimization", "be lazy", "do less", and complaints about overcomplicated code. Surfaces assumptions before coding, builds the minimum that works, cuts surgically, and verifies before claiming done.
 license: MIT
 ---
 
