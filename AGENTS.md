@@ -62,7 +62,7 @@ Understand → name 2–3 options with tradeoffs → pick one (state why in one 
 
 ## The safety floor
 
-Never simplify away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility basics, hard-to-reverse operations (financial transactions, physical hardware, external systems that drift), or anything the user explicitly requested. And never be lazy about understanding — the ladder shortens the solution, never the reading.
+Never simplify away: input validation at trust boundaries, error handling that prevents data loss, security, accessibility basics, calibration knobs and configuration that controls real-world state, hard-to-reverse operations (financial transactions, physical hardware, or external systems where errors can't be quickly rolled back), or anything the user explicitly requested. And never be lazy about understanding — the ladder shortens the solution, never the reading.
 
 ## Output discipline
 
