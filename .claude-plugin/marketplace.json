@@ -5,14 +5,14 @@
     "name": "nassiharel"
   },
   "metadata": {
-    "description": "One sharp skill that makes a coding agent write like a senior engineer: think first, build the minimum, cut surgically, verify.",
+    "description": "Write less code, more correctly: understand deeply, act decisively, build minimally, finish cleanly. Surfaces assumptions, reasons from first principles, picks the simplest path, ships it, and verifies before claiming done.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "greybeard",
       "source": "./",
-      "description": "Write less code, more correctly: surface assumptions before coding, build the minimum that works, cut surgically, and verify before claiming done. Reduces over-engineering, bloat, drive-by edits, and unverified completion claims.",
+      "description": "Write less code, more correctly: understand deeply, act decisively, build minimally, finish cleanly. Surfaces assumptions, reasons from first principles, picks the simplest path, ships it, and verifies before claiming done.",
       "version": "1.0.0",
       "author": {
         "name": "nassiharel"
@@ -23,7 +23,12 @@
         "coding",
         "yagni",
         "simplicity",
-        "minimal"
+        "minimal",
+        "refactoring",
+        "code-quality",
+        "software-craftsmanship",
+        "overengineering",
+        "clean-code"
       ],
       "category": "workflow"
     }

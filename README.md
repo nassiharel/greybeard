@@ -69,6 +69,8 @@ curl --create-dirs -o .github/copilot-instructions.md \
   https://raw.githubusercontent.com/nassiharel/greybeard/main/.github/copilot-instructions.md
 ```
 
+This is a static copy — re-run the command to pick up future updates.
+
 ### Option D — Codex / portable rules file (any agent)
 
 Codex and other agents that read a project rules file pick up the generic `AGENTS.md` ruleset:
@@ -77,6 +79,8 @@ Codex and other agents that read a project rules file pick up the generic `AGENT
 curl -o AGENTS.md \
   https://raw.githubusercontent.com/nassiharel/greybeard/main/AGENTS.md
 ```
+
+This is a static copy — re-run the command to pick up future updates.
 
 Codex also ships a native plugin manifest at `.codex-plugin/plugin.json` — point your host's
 plugin install at this repository and it discovers the manifest for that host. All manifests
@@ -96,14 +100,20 @@ You should notice your agent:
 - Reporting results with evidence ("I ran X and saw Y") instead of "this should work."
 - Saying out loud when it *couldn't* verify something, instead of papering over the gap.
 
+**Example:** Asked to "add a retry loop to the API call." Without greybeard, the agent added a
+generic retry abstraction with configurable strategy, backoff policy, and jitter — 80 lines,
+untested. With greybeard: three extra lines around the existing call, using the language's built-in
+`sleep`, with a comment marking when to extract if a third call site appears.
+
 ## Philosophy
 
-- **Think before coding** — understand the goal; don't guess about anything load-bearing.
-- **Simplicity, not carelessness** — the least code that solves the real problem, with the
-  safety checks intact.
+- **First principles over intuition** — understand the goal fully; don't guess about anything load-bearing.
+- **Simplicity, not carelessness** — the least code that solves the real problem, with the safety checks intact.
 - **Surgical changes** — every changed line traces to the request.
 - **Evidence over claims** — "done" means you watched it work, not that you wrote it.
-- **Honest trade-offs** — this biases toward caution over speed. For trivial tasks, move fast.
+- **Craftsmanship** — clear names, linear flow, risks surfaced early; polish is part of the job.
+- **Decisive execution** — understand deeply, then pick one path and ship it; momentum matters.
+- **Honest trade-offs** — this biases toward caution over speed. For trivial tasks, move fast. On genuinely complex architectural decisions it may over-brake; use judgment.
 
 ## License
 

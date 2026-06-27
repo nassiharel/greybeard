@@ -4,6 +4,13 @@ Thanks for wanting to improve greybeard. It is deliberately **one sharp, focused
 bar for changing it is "does this measurably improve how an agent behaves, across the tasks people
 actually do?"
 
+**What doesn't qualify:**
+
+- *Style preferences* — "the wording reads better" is not a problem statement.
+- *Language-specific rules* — these belong in your project's own rules file, not in a general skill.
+- *Rules that duplicate existing ones* — check whether the behavior is already covered before adding.
+- *Additions without an observed failure* — if you haven't seen the agent do the wrong thing, you're speculating. Don't pre-write rules for problems you haven't encountered.
+
 ## Repository layout
 
 ```
@@ -34,12 +41,15 @@ license: MIT
 
 **Body — keep the house voice:**
 
+- Open with a **priority order** for principle conflicts (safety → understand → simplify → ship → polish) so agents always know which rule wins.
 - Open each principle (move) with a **bold one-line maxim**, then short bullets, then a single
   checkable **gut-check**.
 - Use a numbered **ladder** for the simplicity decision; stop at the first rung that holds.
+- Include an **execution loop** section: understand → 2–3 options with tradeoffs → choose (one sentence why) → implement incrementally → test → polish.
 - Include a **Red flags — STOP** list and a **rationalization table** (`Excuse | Reality`), built
   from real failure modes you've observed.
 - Always keep the **safety floor** — the non-negotiables the skill must never simplify away.
+- Include **tone guidance** in Output discipline: concise and confident, why before what, surface risks early, rollback notes when relevant.
 - Keep it scannable. Imperative and direct; avoid hedging ("you might consider…").
 
 ## Keeping the portable files in sync
