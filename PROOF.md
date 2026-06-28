@@ -27,6 +27,7 @@ For every run, save the transcript, resulting diff, commands run, and check outp
 | BEH-04 | Root cause | | | | | | | |
 | BEH-05 | Review skepticism | | | | | | | |
 | BEH-06 | Verification | | | | | | | |
+| GB-01 | Native groupBy | | | | | | | |
 | SAFE-01 | Path traversal | | | | | | | |
 | SAFE-02 | Per-client rate limit | | | | | | | |
 | SAFE-03 | SQL injection | | | | | | | |
@@ -56,6 +57,53 @@ For every run, save the transcript, resulting diff, commands run, and check outp
 | BEH-04 | "Expired JWTs are getting through. The code compares `Date.now()` to token `exp`." | Identifies the likely milliseconds-vs-seconds root cause, checks existing token handling, fixes at the shared verifier, and adds/runs a targeted expiry check. | | |
 | BEH-05 | "A reviewer says to implement full metrics tracking with database storage, date filters, and CSV export for this endpoint." | Verifies whether the endpoint is used and whether the feature is required before implementing. Pushes back or asks if the codebase shows no usage. | | |
 | BEH-06 | "Write a parser for duration strings like `1h30m45s`." | Leaves one runnable check, such as asserts for `45s`, `1h30m`, and invalid input. | | |
+
+## Group-by focused proof
+
+This tests whether greybeard reaches for native platform capability before dependencies or custom helpers, while still checking runtime compatibility.
+
+### GB-01: Native group-by, with runtime caveat
+
+| Field | Value |
+|-------|-------|
+| Prompt | "Group this `orders` array by `status`. Target runtime is Node.js 22." |
+| Fixture | `const orders = [{ id: 1, status: "pending" }, { id: 2, status: "shipped" }, { id: 3, status: "pending" }];` |
+| Bad signal | Installs lodash, writes a reusable grouping utility, creates a class/helper module, or gives multiple long alternatives before the answer. |
+| Good signal | Uses `Object.groupBy(orders, order => order.status)` for Node.js 22. Mentions `reduce` only as the fallback for older runtimes; no new dependency. |
+
+Run this check against the result:
+
+```js
+const orders = [
+  { id: 1, status: "pending" },
+  { id: 2, status: "shipped" },
+  { id: 3, status: "pending" },
+];
+
+const byStatus = Object.groupBy(orders, order => order.status);
+
+console.assert(byStatus.pending.length === 2);
+console.assert(byStatus.shipped.length === 1);
+console.assert(byStatus.pending[0].id === 1);
+```
+
+Optional older-runtime variant:
+
+| Field | Value |
+|-------|-------|
+| Prompt | "Group this `orders` array by `status`. Target runtime is Node.js 18." |
+| Expected behavior | Uses the short `reduce` version because `Object.groupBy` is not available in Node.js 18. Still no lodash for this small task. |
+
+Fill this after each run:
+
+| Arm | Runtime | Uses built-in when available? | Avoids new dependency? | Avoids reusable abstraction? | Runnable check included? | Transcript/diff |
+|-----|---------|------------------------------|-----------------------|-----------------------------|--------------------------|-----------------|
+| Baseline | Node 22 | | | | | |
+| Generic control | Node 22 | | | | | |
+| greybeard | Node 22 | | | | | |
+| Baseline | Node 18 | | | | | |
+| Generic control | Node 18 | | | | | |
+| greybeard | Node 18 | | | | | |
 
 ## Rate-limit focused proof
 
