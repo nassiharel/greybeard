@@ -17,6 +17,8 @@ actually do?"
 skills/greybeard/SKILL.md      # the canonical long-form skill
 .claude-plugin/                # plugin.json + marketplace.json (Claude Code)
 .codex-plugin/                 # plugin.json (Codex native plugin)
+gemini-extension.json          # Gemini CLI extension, loads AGENTS.md as context
+opencode.json + .opencode/     # OpenCode plugin adapter
 AGENTS.md                      # one-page portable digest (Codex and other rules-file agents)
 .github/copilot-instructions.md # Copilot adapter; body must match AGENTS.md
 ```
@@ -41,11 +43,13 @@ license: MIT
 
 **Body — keep the house voice:**
 
-- Open with a **priority order** for principle conflicts (safety → understand → simplify → ship → polish) so agents always know which rule wins.
+- Open with a **priority order** for principle conflicts (safety → truth → simplicity → quality → evidence → brevity) so agents always know which rule wins.
 - Open each principle (move) with a **bold one-line maxim**, then short bullets, then a single
   checkable **gut-check**.
 - Use a numbered **ladder** for the simplicity decision; stop at the first rung that holds.
-- Include an **execution loop** section: understand → 2–3 options with tradeoffs → choose (one sentence why) → implement incrementally → test → polish.
+- Include an **execution loop** section: frame success → read → assumptions → options → change → verify → report.
+- Include systematic debugging guidance: reproduce, read errors, trace data flow, compare working examples, test one hypothesis, and fix the root cause.
+- Include agentic workflow guidance: delegate only independent or review-worthy work, give focused context, and treat review findings as claims to verify.
 - Include a **Red flags — STOP** list and a **rationalization table** (`Excuse | Reality`), built
   from real failure modes you've observed.
 - Always keep the **safety floor** — the non-negotiables the skill must never simplify away.
@@ -67,12 +71,13 @@ CI (`.github/workflows/validate.yml`) fails if they drift, and also checks that:
 - `skills/greybeard/SKILL.md` has `name` + `description` frontmatter, the description starts with
   "Use when", and the folder name matches `name`,
 - `.claude-plugin/plugin.json` and `marketplace.json` are valid JSON with matching versions, and
-- the per-host manifest (`.codex-plugin`) is valid JSON and carries the **same `version`** *and*
-  the identical canonical `description` as `.claude-plugin/plugin.json`.
+- per-host manifests (`.codex-plugin`, `gemini-extension.json`) are valid JSON and carry the
+  **same `version`** *and* the identical canonical `description` as `.claude-plugin/plugin.json`,
+- OpenCode config points at an in-repo plugin file.
 
 Don't bump the `version` fields by hand — release-please owns versioning (it bumps every manifest
 listed in `release-please-config.json` from `.release-please-manifest.json` on merge to `main`).
-If you change the canonical `description`, change it in all three plugin manifests together.
+If you change the canonical `description`, change it in every plugin or extension manifest together.
 
 ## Testing that a change actually changes behavior
 
