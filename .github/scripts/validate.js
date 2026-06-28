@@ -20,6 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..', '..');
+const rootReal = fs.realpathSync(root);
 const errors = [];
 const warnings = [];
 const fail = (msg) => errors.push(msg);
@@ -59,11 +60,34 @@ function readJson(file, label) {
   }
 }
 
+function isInside(base, target) {
+  const relative = path.relative(base, target);
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
 function assertInsideRepo(abs, label) {
   const resolved = path.resolve(abs);
-  const within = resolved === root || resolved.startsWith(root + path.sep);
-  if (!within) fail(`${label} escapes the repo root`);
-  return within;
+  if (!isInside(root, resolved)) {
+    fail(`${label} escapes the repo root`);
+    return false;
+  }
+
+  if (!fs.existsSync(resolved)) return true;
+
+  let real;
+  try {
+    real = fs.realpathSync(resolved);
+  } catch (e) {
+    fail(`${label} could not be resolved: ${e.message}`);
+    return false;
+  }
+
+  if (!isInside(rootReal, real)) {
+    fail(`${label} escapes the repo root through a symlink`);
+    return false;
+  }
+
+  return true;
 }
 
 // 1 + 2: skills
