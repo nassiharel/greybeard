@@ -38,8 +38,21 @@ function readFrontmatter(file) {
 }
 
 function readJson(file, label) {
+  if (!fs.existsSync(file)) {
+    fail(`${label} is missing`);
+    return null;
+  }
+
+  let text;
   try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
+    text = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    fail(`${label} could not be read: ${e.message}`);
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
   } catch (e) {
     fail(`${label} is not valid JSON: ${e.message}`);
     return null;
