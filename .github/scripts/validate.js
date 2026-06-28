@@ -8,9 +8,10 @@
  *  3. .claude-plugin/plugin.json and marketplace.json are valid JSON.
  *  4. Every skill listed in plugin.json exists on disk, and vice versa.
  *  5. The body of .github/copilot-instructions.md matches AGENTS.md (no drift).
- *  6. Per-host plugin manifests (.codex-plugin) are valid JSON, version-synced
- *     with .claude-plugin/plugin.json, and carry the identical canonical
- *     `description`.
+ *  6. Per-host plugin manifests are valid JSON, version-synced with
+ *     .claude-plugin/plugin.json, and carry the identical canonical
+ *     `description` where the host supports one.
+ *  7. Gemini CLI and OpenCode adapters point at in-repo instruction/plugin files.
  *
  * Exits non-zero on any failure. Warnings are printed but do not fail.
  * Zero dependencies (Node stdlib only).
@@ -19,6 +20,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..', '..');
+const rootReal = fs.realpathSync(root);
 const errors = [];
 const warnings = [];
 const fail = (msg) => errors.push(msg);
@@ -34,6 +36,58 @@ function readFrontmatter(file) {
     if (kv) fm[kv[1]] = kv[2].trim();
   }
   return fm;
+}
+
+function readJson(file, label) {
+  if (!fs.existsSync(file)) {
+    fail(`${label} is missing`);
+    return null;
+  }
+
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    fail(`${label} could not be read: ${e.message}`);
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    fail(`${label} is not valid JSON: ${e.message}`);
+    return null;
+  }
+}
+
+function isInside(base, target) {
+  const relative = path.relative(base, target);
+  return relative === '' || (relative && !relative.startsWith('..') && !path.isAbsolute(relative));
+}
+
+function assertInsideRepo(abs, label) {
+  const resolved = path.resolve(abs);
+  if (!isInside(root, resolved)) {
+    fail(`${label} escapes the repo root`);
+    return false;
+  }
+
+  if (!fs.existsSync(resolved)) return true;
+
+  let real;
+  try {
+    real = fs.realpathSync(resolved);
+  } catch (e) {
+    fail(`${label} could not be resolved: ${e.message}`);
+    return false;
+  }
+
+  if (!isInside(rootReal, real)) {
+    fail(`${label} escapes the repo root through a symlink`);
+    return false;
+  }
+
+  return true;
 }
 
 // 1 + 2: skills
@@ -90,23 +144,16 @@ for (const folder of skillFolders) {
 
 // 3 + 4: plugin manifest
 const pluginPath = path.join(root, '.claude-plugin', 'plugin.json');
-let plugin;
-try {
-  plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf8'));
-} catch (e) {
-  fail(`.claude-plugin/plugin.json is not valid JSON: ${e.message}`);
-}
-let marketplace;
-try {
-  marketplace = JSON.parse(fs.readFileSync(path.join(root, '.claude-plugin', 'marketplace.json'), 'utf8'));
-} catch (e) {
-  fail(`.claude-plugin/marketplace.json is not valid JSON: ${e.message}`);
-}
+const plugin = readJson(pluginPath, '.claude-plugin/plugin.json');
+const marketplace = readJson(path.join(root, '.claude-plugin', 'marketplace.json'), '.claude-plugin/marketplace.json');
 
 // marketplace version(s) must match the plugin version
 if (plugin && marketplace) {
   if (marketplace.metadata && marketplace.metadata.version !== plugin.version) {
     fail(`marketplace.json metadata version '${marketplace.metadata.version}' != plugin version '${plugin.version}'`);
+  }
+  if (marketplace.metadata && marketplace.metadata.description !== plugin.description) {
+    fail('marketplace.json metadata description differs from the canonical .claude-plugin description');
   }
   if (marketplace.plugins !== undefined && !Array.isArray(marketplace.plugins)) {
     fail(`marketplace.json 'plugins' must be an array`);
@@ -114,6 +161,9 @@ if (plugin && marketplace) {
     for (const entry of marketplace.plugins || []) {
       if (entry.version && entry.version !== plugin.version) {
         fail(`marketplace.json plugin '${entry.name}' version '${entry.version}' != plugin version '${plugin.version}'`);
+      }
+      if (entry.description !== plugin.description) {
+        fail(`marketplace.json plugin '${entry.name}' description differs from the canonical .claude-plugin description`);
       }
     }
   }
@@ -154,13 +204,8 @@ if (plugin) {
 for (const hostDir of ['.codex-plugin']) {
   const p = path.join(root, hostDir, 'plugin.json');
   if (!fs.existsSync(p)) continue;
-  let manifest;
-  try {
-    manifest = JSON.parse(fs.readFileSync(p, 'utf8'));
-  } catch (e) {
-    fail(`${hostDir}/plugin.json is not valid JSON: ${e.message}`);
-    continue;
-  }
+  const manifest = readJson(p, `${hostDir}/plugin.json`);
+  if (!manifest) continue;
   if (plugin && manifest.version !== plugin.version) {
     fail(`${hostDir}/plugin.json version '${manifest.version}' != .claude-plugin version '${plugin.version}'`);
   }
@@ -170,12 +215,60 @@ for (const hostDir of ['.codex-plugin']) {
   const skillsRef = typeof manifest.skills === 'string' ? manifest.skills : null;
   if (skillsRef) {
     const abs = path.resolve(root, skillsRef);
-    const within = abs === root || abs.startsWith(root + path.sep);
-    if (!within) {
-      fail(`${hostDir}/plugin.json points skills at '${skillsRef}', which escapes the repo root`);
-    } else if (!fs.existsSync(abs) || !fs.statSync(abs).isDirectory()) {
+    if (assertInsideRepo(abs, `${hostDir}/plugin.json skills path '${skillsRef}'`) && (!fs.existsSync(abs) || !fs.statSync(abs).isDirectory())) {
       fail(`${hostDir}/plugin.json points skills at '${skillsRef}', which is not an existing directory`);
     }
+  }
+}
+
+const geminiPath = path.join(root, 'gemini-extension.json');
+if (fs.existsSync(geminiPath)) {
+  const gemini = readJson(geminiPath, 'gemini-extension.json');
+  if (gemini) {
+    if (plugin && gemini.version !== plugin.version) {
+      fail(`gemini-extension.json version '${gemini.version}' != .claude-plugin version '${plugin.version}'`);
+    }
+    if (plugin && gemini.description !== plugin.description) {
+      fail('gemini-extension.json description differs from the canonical .claude-plugin description');
+    }
+    if (gemini.contextFileName !== 'AGENTS.md') {
+      fail(`gemini-extension.json contextFileName must be 'AGENTS.md'`);
+    }
+    const contextPath = path.resolve(root, gemini.contextFileName || '');
+    if (assertInsideRepo(contextPath, `gemini-extension.json contextFileName '${gemini.contextFileName}'`) && !fs.existsSync(contextPath)) {
+      fail(`gemini-extension.json contextFileName '${gemini.contextFileName}' does not exist`);
+    }
+  }
+}
+
+const opencodePath = path.join(root, 'opencode.json');
+if (fs.existsSync(opencodePath)) {
+  const opencode = readJson(opencodePath, 'opencode.json');
+  if (opencode) {
+    if (!Array.isArray(opencode.plugin) || opencode.plugin.length === 0) {
+      fail(`opencode.json 'plugin' must be a non-empty array`);
+    } else {
+      for (const ref of opencode.plugin) {
+        if (typeof ref !== 'string') {
+          fail(`opencode.json plugin entry ${JSON.stringify(ref)} must be a string`);
+          continue;
+        }
+        const abs = path.resolve(root, ref);
+        if (assertInsideRepo(abs, `opencode.json plugin path '${ref}'`) && !fs.existsSync(abs)) {
+          fail(`opencode.json plugin path '${ref}' does not exist`);
+        }
+      }
+    }
+  }
+}
+
+const releaseConfigPath = path.join(root, 'release-please-config.json');
+const releaseConfig = readJson(releaseConfigPath, 'release-please-config.json');
+if (releaseConfig && fs.existsSync(geminiPath)) {
+  const extraFiles = releaseConfig.packages?.['.']?.['extra-files'] || [];
+  const tracksGemini = extraFiles.some((entry) => entry.path === 'gemini-extension.json' && entry.jsonpath === '$.version');
+  if (!tracksGemini) {
+    fail('release-please-config.json must track gemini-extension.json $.version');
   }
 }
 

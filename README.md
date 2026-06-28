@@ -4,116 +4,112 @@
 
 # greybeard
 
-> One sharp skill that makes your coding agent write like a senior engineer — less code, more
-> correctly, with assumptions surfaced and results verified.
+> A zero-dependency skill for coding agents: less AI slop, more correct code.
 
-Most mistakes a coding agent makes aren't about not knowing the language. They're about
-*judgment*: guessing instead of asking, over-engineering a simple task, touching code it
-shouldn't, and declaring victory without checking. greybeard encodes the habits a seasoned
-engineer has internalized into a single skill that triggers automatically when it's relevant.
+Most coding-agent mistakes are judgment failures, not syntax failures: guessing instead of asking,
+building abstractions before the second case exists, patching symptoms, accepting review comments
+blindly, touching unrelated code, and saying "done" without evidence.
 
-## The four moves
+greybeard is one unified operating discipline for that:
 
-A greybeard, before and during any change:
-
-1. **Think first** — understand the problem and the code it touches *fully*; surface
-   assumptions, interpretations, and confusion *before* writing.
-2. **Build the minimum** — climb the simplicity ladder (YAGNI → reuse what's here → stdlib →
-   native feature → installed dep → one line → minimum) and stop at the first rung that holds.
-3. **Cut surgically** — every changed line traces to the request; fix the root cause once, not
-   the symptom in N places; match the existing style.
-4. **Verify** — define success as something observable, run it, read the output, *then* claim
-   done; leave one runnable check behind.
-
-Plus a hard **safety floor** (what you never simplify away), terse **output discipline**, and an
-**anti-rationalization** layer so the discipline survives pressure.
-
-## The problems it solves
-
-| Problem | The skill's answer |
-|---------|--------------------|
-| Assumes what you meant and runs with it. | Surface assumptions; ask the questions that change the approach. |
-| Over-complicates code, bloats abstractions, adds unrequested "flexibility". | Climb the simplicity ladder; stop at the first rung that holds. |
-| Reinvents a helper that already exists. | Read first — reuse what's there before writing new code. |
-| Changes more than it needs to; leaves messes. | Surgical changes — every line traces to the request. |
-| Patches the line in the ticket and leaves sibling callers broken. | Fix the root cause once, where all callers route through. |
-| Says "this should work" without running anything. | Verify with fresh evidence before claiming done. |
-| Cuts corners on safety in the name of simplicity. | The safety floor — simplicity never removes the check that makes it safe. |
-| Buries the result under a wall of justifying prose. | Lead with the outcome; if the explanation outgrows the change, cut it. |
+1. **Think from facts** - surface load-bearing assumptions, ask only questions that change the implementation, and push back when the request is unsafe or overbuilt.
+2. **Build the minimum** - reuse what exists, prefer stdlib and native platform features, avoid speculative dependencies and abstractions.
+3. **Debug systematically** - reproduce, read the full error, trace bad data to its source, form one hypothesis, and fix the root cause.
+4. **Cut surgically** - every changed line traces to the request, verified root cause, or cleanup created by the change.
+5. **Use agents like tools** - delegate only independent or review-worthy work, with complete task-specific context.
+6. **Verify before done** - run the narrowest check that proves the behavior, then report the result plainly.
 
 ## Install
 
-### Option A — `npx skills` (recommended, any host)
+### `npx skills`
 
 ```bash
 npx skills add nassiharel/greybeard
 ```
 
-One command, no marketplace step — the skill installs and triggers automatically.
+This installs the reusable skill from `skills/greybeard/SKILL.md`.
 
-### Option B — Claude Code plugin
+### Claude Code plugin
 
-```
+```text
 /plugin marketplace add nassiharel/greybeard
 /plugin install greybeard@greybeard
 ```
 
-The skill then loads automatically when its triggers match — you don't have to invoke it by name.
+The plugin manifest points at the same `skills/` directory.
 
-### Option C — GitHub Copilot
+### Codex
 
-Copilot reads `.github/copilot-instructions.md` from a project automatically. Drop the ruleset in:
-
-```bash
-curl --create-dirs -o .github/copilot-instructions.md \
-  https://raw.githubusercontent.com/nassiharel/greybeard/main/.github/copilot-instructions.md
-```
-
-This is a static copy — re-run the command to pick up future updates.
-
-### Option D — Codex / portable rules file (any agent)
-
-Codex and other agents that read a project rules file pick up the generic `AGENTS.md` ruleset:
+Codex can use the native plugin manifest in `.codex-plugin/plugin.json`, or the portable
+instructions file:
 
 ```bash
 curl -o AGENTS.md \
   https://raw.githubusercontent.com/nassiharel/greybeard/main/AGENTS.md
 ```
 
-This is a static copy — re-run the command to pick up future updates.
+Use `~/.codex/AGENTS.md` if you want the compact rules globally.
 
-Codex also ships a native plugin manifest at `.codex-plugin/plugin.json` — point your host's
-plugin install at this repository and it discovers the manifest for that host. All manifests
-reference the same `skills/` directory.
+### Gemini CLI
 
-`AGENTS.md` and `.github/copilot-instructions.md` are compact distillations of the skill; the
-full long-form version is `skills/greybeard/SKILL.md`.
+This repo ships `gemini-extension.json` with `contextFileName` set to `AGENTS.md`, so the compact
+rules load as extension context.
 
-## How to know it's working
+```bash
+gemini extensions install https://github.com/nassiharel/greybeard
+```
 
-You should notice your agent:
+Restart Gemini CLI after installing or updating the extension.
 
-- Asking a sharp clarifying question *before* building, instead of after rebuilding.
-- Producing smaller diffs — changes that map cleanly to what you asked for, preferring a 10-line
-  fix over a 200-line redesign.
-- Reusing existing code and reaching for the stdlib first instead of inventing new abstractions.
-- Reporting results with evidence ("I ran X and saw Y") instead of "this should work."
-- Saying out loud when it *couldn't* verify something, instead of papering over the gap.
+### OpenCode
 
-**Example:** Asked to "add a retry loop to the API call." Without greybeard, the agent added a
-generic retry abstraction with configurable strategy, backoff policy, and jitter — 80 lines,
-untested. With greybeard: three extra lines around the existing call, using the language's built-in
-`sleep`, with a comment marking when to extract if a third call site appears.
+OpenCode can read `AGENTS.md` from the project root. This repo also ships a thin plugin that
+registers `skills/` and injects `AGENTS.md` only when it has not already been loaded.
+
+Add the plugin to your `opencode.json`:
+
+```json
+{
+  "plugin": ["./.opencode/plugins/greybeard.mjs"]
+}
+```
+
+If you keep one shared checkout, point that entry at the plugin's absolute path.
+
+### GitHub Copilot
+
+Copilot reads `.github/copilot-instructions.md` from a repository. Install the compact rules with:
+
+```bash
+curl --create-dirs -o .github/copilot-instructions.md \
+  https://raw.githubusercontent.com/nassiharel/greybeard/main/.github/copilot-instructions.md
+```
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `skills/greybeard/SKILL.md` | Canonical long-form skill |
+| `AGENTS.md` | Compact portable rules for agents that read project instructions |
+| `.github/copilot-instructions.md` | Copilot adapter generated from `AGENTS.md` |
+| `.claude-plugin/plugin.json` | Claude Code plugin metadata |
+| `.codex-plugin/plugin.json` | Codex plugin metadata |
+| `gemini-extension.json` | Gemini CLI extension metadata |
+| `opencode.json` and `.opencode/plugins/greybeard.mjs` | OpenCode plugin adapter |
+
+## How to know it is working
+
+You should see smaller diffs, fewer invented abstractions, earlier clarifying questions, more
+root-cause debugging, review feedback checked before implementation, and final answers that lead
+with what changed and what was verified.
 
 ## Philosophy
 
-- **First principles over intuition** — understand the goal fully; don't guess about anything load-bearing.
-- **Simplicity, not carelessness** — the least code that solves the real problem, with the safety checks intact.
-- **Surgical changes** — every changed line traces to the request.
-- **Evidence over claims** — "done" means you watched it work, not that you wrote it.
-- **Craftsmanship** — clear names, linear flow, risks surfaced early; polish is part of the job.
-- **Decisive execution** — understand deeply, then pick one path and ship it; momentum matters.
-- **Honest trade-offs** — this biases toward caution over speed. For trivial tasks, move fast. On genuinely complex architectural decisions it may over-brake; use judgment.
+- **Truth over momentum** - name uncertainty instead of hiding it.
+- **Simplicity over cleverness** - the best code is still the code never written.
+- **Root cause over symptoms** - patch once where the bug begins.
+- **Evidence over confidence** - done means checked.
+- **Brevity over filler** - cut prose, not precision.
 
 ## License
 

@@ -1,0 +1,6 @@
+{
+  "name": "greybeard",
+  "description": "Write clear, correct code with less AI slop: surface assumptions, choose the simplest safe path, fix root causes, use agents only when useful, and verify before claiming done.",
+  "version": "1.0.0",
+  "contextFileName": "AGENTS.md"
+}
