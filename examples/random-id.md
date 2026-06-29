@@ -34,7 +34,7 @@ const id = crypto.randomUUID();
 
 ```js
 const id = crypto.randomUUID();
-console.assert(/^[0-9a-f-]{36}$/.test(id));
+console.assert(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(id));
 console.assert(crypto.randomUUID() !== crypto.randomUUID());
 ```
 
