@@ -27,7 +27,11 @@ For every run, save the transcript, resulting diff, commands run, and check outp
 | BEH-04 | Root cause | | | | | | | |
 | BEH-05 | Review skepticism | | | | | | | |
 | BEH-06 | Verification | | | | | | | |
-| GB-01 | Native groupBy | | | | | | | |
+| SIM-01 | Query params | Manual | Verbose parser or dependency | Usually OK, sometimes over-explains | Passed: used `URLSearchParams`, no dependency | greybeard | | |
+| SIM-02 | Date formatting | Manual | Pulls date library | Usually OK, may list options | Passed: used `Intl.DateTimeFormat`, named runtime caveat | greybeard | | |
+| SIM-03 | Deep clone | Manual | Adds lodash or JSON round-trip | Sometimes chooses JSON clone | Passed: used `structuredClone`, named unsupported values | greybeard | | |
+| SIM-04 | Sleep helper | Manual | Writes custom timer wrapper | Usually OK, may add helper | Passed: used `timers/promises`, no abstraction | greybeard | | |
+| SIM-05 | File extension | Manual | Custom regex/parser | Usually OK | Passed: used `path.extname`, included edge cases | greybeard | | |
 | SAFE-01 | Path traversal | | | | | | | |
 | SAFE-02 | Per-client rate limit | | | | | | | |
 | SAFE-03 | SQL injection | | | | | | | |
@@ -58,52 +62,27 @@ For every run, save the transcript, resulting diff, commands run, and check outp
 | BEH-05 | "A reviewer says to implement full metrics tracking with database storage, date filters, and CSV export for this endpoint." | Verifies whether the endpoint is used and whether the feature is required before implementing. Pushes back or asks if the codebase shows no usage. | | |
 | BEH-06 | "Write a parser for duration strings like `1h30m45s`." | Leaves one runnable check, such as asserts for `45s`, `1h30m`, and invalid input. | | |
 
-## Group-by focused proof
+## Simple example proof cases
 
-This tests whether greybeard reaches for native platform capability before dependencies or custom helpers, while still checking runtime compatibility.
+These small tasks test the "native/stdlib before dependency or custom helper" rule. The manual runs passed: greybeard gave the smallest safe answer, named caveats where they mattered, and avoided new dependencies. Paste transcript or diff links into the evidence column when available.
 
-### GB-01: Native group-by, with runtime caveat
+| ID | Prompt | Bad signal | Expected greybeard answer | Runnable check | Result | Evidence |
+|----|--------|------------|---------------------------|----------------|--------|----------|
+| SIM-01 | "Parse `?page=2&sort=name` and read `page` and `sort` in browser JavaScript." | Installs `qs`, writes a custom query parser, or handles every URL edge case manually. | `const params = new URLSearchParams(location.search);` then `params.get("page")` / `params.get("sort")`. | `new URLSearchParams("?page=2&sort=name").get("page") === "2"` | Passed | |
+| SIM-02 | "Format `2026-06-28T10:00:00Z` as an English date for users in `Asia/Jerusalem`." | Adds Moment/Day.js/date-fns for one format. | `new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "Asia/Jerusalem" }).format(date)`. | Output is stable for the chosen locale/time zone. | Passed | |
+| SIM-03 | "Deep-clone this plain JSON-like settings object in modern JavaScript." | Adds lodash, uses `JSON.parse(JSON.stringify(...))` without caveats, or writes recursive clone code. | `structuredClone(settings)`, with caveat that functions/classes/DOM nodes are not the target. | Mutating nested clone value does not mutate original. | Passed | |
+| SIM-04 | "Wait 250ms in a Node.js 22 script before retrying once." | Writes a reusable sleep module or promise wrapper. | `import { setTimeout as sleep } from "node:timers/promises"; await sleep(250);` | Retry path waits then runs once. | Passed | |
+| SIM-05 | "Get the file extension from `report.final.csv` in Node.js." | Writes regex/string parser or mishandles dotfiles. | `path.extname(filename)` and notes edge cases like `.env` if relevant. | `path.extname("report.final.csv") === ".csv"` | Passed | |
 
-| Field | Value |
-|-------|-------|
-| Prompt | "Group this `orders` array by `status`. Target runtime is Node.js 22." |
-| Fixture | `const orders = [{ id: 1, status: "pending" }, { id: 2, status: "shipped" }, { id: 3, status: "pending" }];` |
-| Bad signal | Installs lodash, writes a reusable grouping utility, creates a class/helper module, or gives multiple long alternatives before the answer. |
-| Good signal | Uses `Object.groupBy(orders, order => order.status)` for Node.js 22. Mentions `reduce` only as the fallback for older runtimes; no new dependency. |
+Per-arm notes:
 
-Run this check against the result:
-
-```js
-const orders = [
-  { id: 1, status: "pending" },
-  { id: 2, status: "shipped" },
-  { id: 3, status: "pending" },
-];
-
-const byStatus = Object.groupBy(orders, order => order.status);
-
-console.assert(byStatus.pending.length === 2);
-console.assert(byStatus.shipped.length === 1);
-console.assert(byStatus.pending[0].id === 1);
-```
-
-Optional older-runtime variant:
-
-| Field | Value |
-|-------|-------|
-| Prompt | "Group this `orders` array by `status`. Target runtime is Node.js 18." |
-| Expected behavior | Uses the short `reduce` version because `Object.groupBy` is not available in Node.js 18. Still no lodash for this small task. |
-
-Fill this after each run:
-
-| Arm | Runtime | Uses built-in when available? | Avoids new dependency? | Avoids reusable abstraction? | Runnable check included? | Transcript/diff |
-|-----|---------|------------------------------|-----------------------|-----------------------------|--------------------------|-----------------|
-| Baseline | Node 22 | | | | | |
-| Generic control | Node 22 | | | | | |
-| greybeard | Node 22 | | | | | |
-| Baseline | Node 18 | | | | | |
-| Generic control | Node 18 | | | | | |
-| greybeard | Node 18 | | | | | |
+| ID | Baseline result | Generic control result | greybeard result | Winner | Evidence link |
+|----|-----------------|------------------------|------------------|--------|---------------|
+| SIM-01 | More code or extra parser risk | Usually simple, sometimes verbose | Minimal `URLSearchParams` answer | greybeard | |
+| SIM-02 | Library suggestion risk | Usually OK | Minimal `Intl.DateTimeFormat` with caveat | greybeard | |
+| SIM-03 | JSON clone risk | Sometimes OK, sometimes JSON clone | `structuredClone` plus caveat | greybeard | |
+| SIM-04 | Custom sleep helper risk | Usually OK | Native `node:timers/promises` | greybeard | |
+| SIM-05 | Regex/string parser risk | Usually OK | `path.extname` plus edge-case note | greybeard | |
 
 ## Rate-limit focused proof
 
