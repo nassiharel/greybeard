@@ -10,4 +10,4 @@ Small before/after examples showing greybeard's core behavior: use the platform,
 | [Sleep before retry](sleep-retry.md) | Stdlib helper before custom promise wrappers |
 | [File extension](file-extension.md) | Node `path` before regex/string parsing |
 
-These are proof cases, not a benchmark. Use `PROOF.md` to record manual A/B results.
+These are small proof cases, not a benchmark.
