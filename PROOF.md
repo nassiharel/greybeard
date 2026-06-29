@@ -64,15 +64,15 @@ For every run, save the transcript, resulting diff, commands run, and check outp
 
 ## Simple example proof cases
 
-These small tasks test the "native/stdlib before dependency or custom helper" rule. The manual runs passed: greybeard gave the smallest safe answer, named caveats where they mattered, and avoided new dependencies. Paste transcript or diff links into the evidence column when available.
+These small tasks test the "native/stdlib before dependency or custom helper" rule. The manual runs passed: greybeard gave the smallest safe answer, named caveats where they mattered, and avoided new dependencies. Full before/after examples live in [`examples/`](examples/). Paste transcript or diff links into the evidence column when available.
 
 | ID | Prompt | Bad signal | Expected greybeard answer | Runnable check | Result | Evidence |
 |----|--------|------------|---------------------------|----------------|--------|----------|
-| SIM-01 | "Parse `?page=2&sort=name` and read `page` and `sort` in browser JavaScript." | Installs `qs`, writes a custom query parser, or handles every URL edge case manually. | `const params = new URLSearchParams(location.search);` then `params.get("page")` / `params.get("sort")`. | `new URLSearchParams("?page=2&sort=name").get("page") === "2"` | Passed | |
-| SIM-02 | "Format `2026-06-28T10:00:00Z` as an English date for users in `Asia/Jerusalem`." | Adds Moment/Day.js/date-fns for one format. | `new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "Asia/Jerusalem" }).format(date)`. | Output is stable for the chosen locale/time zone. | Passed | |
-| SIM-03 | "Deep-clone this plain JSON-like settings object in modern JavaScript." | Adds lodash, uses `JSON.parse(JSON.stringify(...))` without caveats, or writes recursive clone code. | `structuredClone(settings)`, with caveat that functions/classes/DOM nodes are not the target. | Mutating nested clone value does not mutate original. | Passed | |
-| SIM-04 | "Wait 250ms in a Node.js 22 script before retrying once." | Writes a reusable sleep module or promise wrapper. | `import { setTimeout as sleep } from "node:timers/promises"; await sleep(250);` | Retry path waits then runs once. | Passed | |
-| SIM-05 | "Get the file extension from `report.final.csv` in Node.js." | Writes regex/string parser or mishandles dotfiles. | `path.extname(filename)` and notes edge cases like `.env` if relevant. | `path.extname("report.final.csv") === ".csv"` | Passed | |
+| SIM-01 | "Parse `?page=2&sort=name` and read `page` and `sort` in browser JavaScript." | Installs `qs`, writes a custom query parser, or handles every URL edge case manually. | `const params = new URLSearchParams(location.search);` then `params.get("page")` / `params.get("sort")`. | `new URLSearchParams("?page=2&sort=name").get("page") === "2"` | Passed | [example](examples/query-params.md) |
+| SIM-02 | "Format `2026-06-28T10:00:00Z` as an English date for users in `Asia/Jerusalem`." | Adds Moment/Day.js/date-fns for one format. | `new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "Asia/Jerusalem" }).format(date)`. | Output is stable for the chosen locale/time zone. | Passed | [example](examples/date-formatting.md) |
+| SIM-03 | "Deep-clone this plain JSON-like settings object in modern JavaScript." | Adds lodash, uses `JSON.parse(JSON.stringify(...))` without caveats, or writes recursive clone code. | `structuredClone(settings)`, with caveat that functions/classes/DOM nodes are not the target. | Mutating nested clone value does not mutate original. | Passed | [example](examples/deep-clone.md) |
+| SIM-04 | "Wait 250ms in a Node.js 22 script before retrying once." | Writes a reusable sleep module or promise wrapper. | `import { setTimeout as sleep } from "node:timers/promises"; await sleep(250);` | Retry path waits then runs once. | Passed | [example](examples/sleep-retry.md) |
+| SIM-05 | "Get the file extension from `report.final.csv` in Node.js." | Writes regex/string parser or mishandles dotfiles. | `path.extname(filename)` and notes edge cases like `.env` if relevant. | `path.extname("report.final.csv") === ".csv"` | Passed | [example](examples/file-extension.md) |
 
 Per-arm notes:
 
