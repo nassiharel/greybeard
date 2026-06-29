@@ -4,9 +4,9 @@ Small before/after examples showing greybeard's core behavior: use the platform,
 
 | Example | What it proves |
 |---------|----------------|
-| [Query params](query-params.md) | Browser API before custom parsing or dependencies |
+| [Random ID](random-id.md) | Native crypto before a UUID dependency |
+| [Unique array](unique-array.md) | `Set` before lodash or O(n²) filtering |
 | [URL hostname](url-hostname.md) | `URL` before regex/string parsing |
-| [Deep clone](deep-clone.md) | Native clone with honest caveats |
 | [Sleep before retry](sleep-retry.md) | Stdlib helper before custom promise wrappers |
 | [File extension](file-extension.md) | Node `path` before regex/string parsing |
 

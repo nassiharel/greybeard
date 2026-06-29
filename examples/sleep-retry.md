@@ -12,7 +12,7 @@ function sleep(ms) {
 async function retry(fn) {
   try {
     return await fn();
-  } catch (error) {
+  } catch {
     await sleep(250);
     return fn();
   }
@@ -28,7 +28,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 try {
   await fn();
-} catch (error) {
+} catch {
   await sleep(250);
   await fn();
 }

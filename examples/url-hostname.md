@@ -35,7 +35,7 @@ Let `URL` throw for invalid input unless the caller needs a softer error shape.
 
 ```js
 console.assert(
-  new URL("https://api.example.com:8443/v1/users?limit=10").hostname === "api.example.com",
+  new URL("https://api.example.com:8443/v1/users?limit=10").hostname === "api.example.com"
 );
 console.assert(new URL("https://user:pass@example.org/path").hostname === "example.org");
 console.assert(new URL("https://[2001:db8::1]:443/").hostname === "[2001:db8::1]");
