@@ -5,7 +5,7 @@ Small before/after examples showing greybeard's core behavior: use the platform,
 | Example | What it proves |
 |---------|----------------|
 | [Random ID](random-id.md) | Native crypto before a UUID dependency |
-| [Unique array](unique-array.md) | `Set` before lodash or O(n²) filtering |
+| [Relative time](relative-time.md) | `Intl.RelativeTimeFormat` before moment/date-fns |
 | [URL hostname](url-hostname.md) | `URL` before regex/string parsing |
 | [Sleep before retry](sleep-retry.md) | Stdlib helper before custom promise wrappers |
 | [File extension](file-extension.md) | Node `path` before regex/string parsing |
