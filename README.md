@@ -4,7 +4,7 @@
 
 # greybeard
 
-> A zero-dependency skill for coding agents: less AI slop, more correct code.
+> Less AI slop. More engineering judgment and more correct code.
 
 Most coding-agent mistakes are judgment failures, not syntax failures: guessing instead of asking,
 building abstractions before the second case exists, patching symptoms, accepting review comments
