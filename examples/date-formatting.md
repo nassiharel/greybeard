@@ -2,24 +2,19 @@
 
 **Task:** "Format `2026-06-28T10:00:00Z` as an English date for users in `Asia/Jerusalem`."
 
-## Without greybeard
+## Observed baseline
 
-```bash
-npm install dayjs
-```
+Claude already gave the right shape without the skill:
 
 ```js
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-const label = dayjs("2026-06-28T10:00:00Z")
-  .tz("Asia/Jerusalem")
-  .format("MMM D, YYYY");
+const date = new Date("2026-06-28T10:00:00Z");
+const label = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+  timeZone: "Asia/Jerusalem",
+}).format(date);
 ```
+
+This is a tie, not proof that greybeard improves the answer.
 
 ## With greybeard
 

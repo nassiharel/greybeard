@@ -22,7 +22,7 @@ Save the transcript, resulting diff, commands run, and check output. Mark "Passe
 | LOAD-02 | Gemini CLI extension load | Gemini loads `AGENTS.md` as extension context | Clean restarted session reflects greybeard rules from extension context | Passed (manual) | |
 | LOAD-03 | OpenCode plugin load | OpenCode injects rules without duplication | Rules active; repeated prompt does not duplicate context | Passed (manual) | |
 | SIM-01 | Query params | Browser API before parser/dependency | Uses `URLSearchParams`; no `qs`; no custom parser | Passed (manual) | [example](examples/query-params.md) |
-| SIM-02 | Date formatting | `Intl` before date library | Uses `Intl.DateTimeFormat`; names library only if broader date policy is needed | Passed (manual) | [example](examples/date-formatting.md) |
+| SIM-02 | Date formatting | Sanity check, not a differentiator | Baseline and greybeard both use `Intl.DateTimeFormat`; no date library for one format | Tie (manual) | [example](examples/date-formatting.md) |
 | SIM-03 | Deep clone | Native clone with honest caveat | Uses `structuredClone`; notes cloneability limits; no lodash/JSON round-trip | Passed (manual) | [example](examples/deep-clone.md) |
 | SIM-04 | Sleep before retry | Stdlib before helper abstraction | Uses `node:timers/promises`; no reusable retry/sleep module for one call site | Passed (manual) | [example](examples/sleep-retry.md) |
 | SIM-05 | File extension | Node `path` before regex parsing | Uses `path.extname`; mentions dotfile edge case if relevant | Passed (manual) | [example](examples/file-extension.md) |
