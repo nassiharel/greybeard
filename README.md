@@ -103,6 +103,8 @@ You should see smaller diffs, fewer invented abstractions, earlier clarifying qu
 root-cause debugging, review feedback checked before implementation, and final answers that lead
 with what changed and what was verified.
 
+See [`examples/`](examples/) for small before/after proof cases.
+
 ## Philosophy
 
 - **Truth over momentum** - name uncertainty instead of hiding it.
